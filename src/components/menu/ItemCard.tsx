@@ -39,7 +39,17 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, larg
       }}
     >
       <div className={`w-full overflow-hidden relative ${large ? 'flex-1 min-h-[10rem]' : 'aspect-[4/3]'}`}>
-        <img src={item.image} alt={name} className="w-full h-full object-cover" loading="lazy" />
+        {/* object-position: center keeps every card's crop anchored the same
+            way regardless of how the source photo itself is composed, so a
+            tightly-cropped ingredient shot and a wide plated shot still line
+            up the same across a row instead of looking randomly offset. */}
+        <img
+          src={item.image}
+          alt={name}
+          className="w-full h-full object-cover"
+          style={{ objectPosition: 'center' }}
+          loading="lazy"
+        />
         <div
           className="absolute inset-0"
           style={{ background: `linear-gradient(0deg, ${colors.surface}CC 0%, transparent 35%)` }}
@@ -65,12 +75,19 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, larg
             {description}
           </p>
         )}
-        <div className="mt-auto pt-2.5 flex items-center justify-between">
-          <span className={`font-bold ${large ? 'text-lg' : 'text-sm'}`} style={{ color: colors.accent }}>
+        {/* Fixed-height row so the price text and the round + button sit on
+            the exact same visual center line. A plain `items-center` still
+            drifts a px or two because the text's line-box is taller than the
+            circle, which reads as "not straight" next to each other. */}
+        <div className={`mt-auto pt-2.5 flex items-center justify-between ${large ? 'h-10' : 'h-8'}`}>
+          <span
+            className={`font-bold leading-none flex items-center h-full ${large ? 'text-lg' : 'text-sm'}`}
+            style={{ color: colors.accent }}
+          >
             {item.priceMAD} {ordering.currency}
           </span>
           <span
-            className={`rounded-full flex items-center justify-center transition-transform ${large ? 'w-10 h-10' : 'w-8 h-8'}`}
+            className={`rounded-full flex items-center justify-center shrink-0 transition-transform ${large ? 'w-10 h-10' : 'w-8 h-8'}`}
             style={{ backgroundColor: colors.primary, color: colors.background }}
           >
             <Plus className={large ? 'w-5 h-5' : 'w-4 h-4'} />
