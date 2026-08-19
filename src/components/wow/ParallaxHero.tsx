@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
+import React, { useRef, useState } from 'react';
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'motion/react';
 import { brandConfig } from '../../config/brand.config';
 import { grainSvgDataUri } from '../../config/theme';
 import { MagneticButton } from '../ui/MagneticButton';
@@ -21,7 +21,7 @@ const wordVariants = {
 
 // Wow module (Layer 3): "parallaxHero", now a genuinely distinct layout
 // rather than a polished version of the most generic hero pattern that
-// exists (centered text over a photo). Five deliberate departures:
+// exists (centered text over a photo). Deliberate departures:
 //   1. Asymmetric split on larger screens — a solid text panel + a photo
 //      panel bleeding to the edge, instead of everything centered.
 //   2. An opening reveal: the photo wipes into view once on mount instead
@@ -31,6 +31,12 @@ const wordVariants = {
 //   4. A designed scroll cue — a thin traveling dot on a vertical line —
 //      instead of a stock chevron icon.
 //   5. A subtle film-grain overlay for texture, tied to scroll position.
+//   6. Finger-following warm light: touch/drag the photo and a soft warm
+//      glow follows your finger, like lighting the dish with a match in a
+//      dark room. A real touch-driven interaction, not an ambient loop.
+//   7. Drifting steam layer: 3 soft blurred shapes that drift upward and
+//      sideways on their own independent loops, giving the photo a sense
+//      of depth/life instead of being one flat static layer.
 export const ParallaxHero: React.FC<WowHeroProps> = ({ language, onCtaClick }) => {
   const { hero, colors, identity } = brandConfig;
   const { scrollY } = useScroll();
@@ -38,13 +44,38 @@ export const ParallaxHero: React.FC<WowHeroProps> = ({ language, onCtaClick }) =
   const grainOpacity = useTransform(scrollY, [0, 400], [0.06, 0.02]);
   const [revealed, setRevealed] = useState(false);
 
+  // Finger/cursor-following spotlight. Percent-based (0-100) so the glow
+  // stays correctly positioned regardless of the media container's size.
+  const lightX = useMotionValue(50);
+  const lightY = useMotionValue(40);
+  const springLightX = useSpring(lightX, { stiffness: 120, damping: 20 });
+  const springLightY = useSpring(lightY, { stiffness: 120, damping: 20 });
+  const [lightActive, setLightActive] = useState(false);
+  const lightIdleTimer = useRef<number | undefined>(undefined);
+
+  const updateLight = (clientX: number, clientY: number, rect: DOMRect) => {
+    lightX.set(((clientX - rect.left) / rect.width) * 100);
+    lightY.set(((clientY - rect.top) / rect.height) * 100);
+    setLightActive(true);
+    window.clearTimeout(lightIdleTimer.current);
+    lightIdleTimer.current = window.setTimeout(() => setLightActive(false), 1400);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    updateLight(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect());
+  };
+
   const headline = hero.headline[language] ?? hero.headline.fr;
   const subheadline = hero.subheadline[language] ?? hero.subheadline.fr;
   const cta = hero.ctaLabel[language] ?? hero.ctaLabel.fr;
   const words = headline.split(' ');
 
   const Media = (
-    <motion.div className="absolute inset-0 overflow-hidden">
+    <motion.div
+      className="absolute inset-0 overflow-hidden touch-pan-y"
+      onPointerMove={handlePointerMove}
+      onPointerDown={handlePointerMove}
+    >
       {/* Opening reveal: photo wipes in from the edge on first mount */}
       <motion.div
         initial={{ clipPath: 'inset(0 0 0 100%)' }}
@@ -76,6 +107,47 @@ export const ParallaxHero: React.FC<WowHeroProps> = ({ language, onCtaClick }) =
             }}
           />
           <div className="absolute inset-0" style={{ background: `${colors.background}22` }} />
+
+          {/* Drifting steam: three soft blurred blobs, each on its own slow,
+              independent loop (different duration/direction) so together
+              they never look mechanically synced — the photo feels alive
+              even when nobody is touching the screen. */}
+          <div className="absolute inset-0 pointer-events-none mix-blend-screen" style={{ opacity: 0.35 }}>
+            <motion.div
+              className="absolute rounded-full"
+              style={{ width: '55%', height: '55%', left: '10%', top: '15%', background: `radial-gradient(circle, ${colors.background}CC 0%, transparent 70%)`, filter: 'blur(28px)' }}
+              animate={{ x: [0, 30, -10, 0], y: [0, -40, -20, 0], opacity: [0.5, 0.8, 0.5, 0.5] }}
+              transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+              className="absolute rounded-full"
+              style={{ width: '40%', height: '40%', right: '8%', top: '30%', background: `radial-gradient(circle, ${colors.background}B3 0%, transparent 70%)`, filter: 'blur(24px)' }}
+              animate={{ x: [0, -25, 15, 0], y: [0, -30, -10, 0], opacity: [0.4, 0.7, 0.4, 0.4] }}
+              transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+            />
+            <motion.div
+              className="absolute rounded-full"
+              style={{ width: '35%', height: '35%', left: '35%', bottom: '10%', background: `radial-gradient(circle, ${colors.background}99 0%, transparent 70%)`, filter: 'blur(22px)' }}
+              animate={{ x: [0, 20, -15, 0], y: [0, -25, -5, 0], opacity: [0.3, 0.6, 0.3, 0.3] }}
+              transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
+            />
+          </div>
+
+          {/* Finger-following warm light — drag/touch the photo and a soft
+              glow follows the exact point of contact, like lighting the
+              dish with a match. Fades out ~1.4s after the finger lifts. */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none mix-blend-soft-light"
+            style={{
+              opacity: lightActive ? 0.9 : 0,
+              transition: 'opacity 0.5s ease',
+              background: useTransform(
+                [springLightX, springLightY],
+                ([lx, ly]: number[]) =>
+                  `radial-gradient(circle 220px at ${lx}% ${ly}%, ${colors.accent} 0%, transparent 70%)`
+              ),
+            }}
+          />
 
           {/* Film grain, subtly fading as you scroll past the hero */}
           <motion.div
