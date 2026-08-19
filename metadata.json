@@ -1,0 +1,6 @@
+{
+  "name": "Amplify Menu Engine — Boilerplate",
+  "description": "Amplify Growth Studio's reusable restaurant landing page engine. Fork this per client, fill in src/config/brand.config.ts, do not modify src/components/layout, src/components/menu or src/components/cart unless you are changing the engine itself for every client at once.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
