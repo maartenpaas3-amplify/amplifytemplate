@@ -30,6 +30,13 @@ export const radiusTokens = {
 // instead of stacking a glow + ring + particles + nudge on top of a shape.
 export const cutCornerClipPath = 'polygon(0% 0%, 100% 0%, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0% 100%)';
 
+// Grain texture as an inline SVG data-uri (feTurbulence) — no image asset
+// needed, works for every client. Shared by ParallaxHero's film-grain layer
+// AND the global PaperTexture overlay, so both use the exact same noise
+// rather than two similar-but-different textures.
+export const grainSvgDataUri =
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>";
+
 export const shadowTokens = {
   card: '0 10px 40px rgba(0,0,0,0.35)',
   drawer: '0 10px 40px rgba(0,0,0,0.9)',

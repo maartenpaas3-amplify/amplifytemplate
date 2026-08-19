@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Plus } from 'lucide-react';
 import { brandConfig } from '../../config/brand.config';
 import { motionTokens } from '../../config/theme';
+import { OrnamentDivider } from '../ui/OrnamentDivider';
 import type { Language, MenuItem } from '../../types';
 
 interface ItemCardProps {
@@ -64,6 +65,9 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, larg
         )}
       </div>
       <div className={`flex flex-col gap-1.5 ${large ? 'p-5' : 'p-4'}`}>
+        {/* The studio's one ornamental detail also marks the signature dish
+            card, at small scale — the second (and last) place it appears. */}
+        {large && <OrnamentDivider color={colors.accent} height={9} opacity={0.75} className="mb-0.5 max-w-[7rem]" />}
         <h3
           className={`font-display font-semibold leading-tight ${large ? 'text-xl sm:text-2xl' : 'text-[15px]'}`}
           style={{ color: colors.textPrimary }}

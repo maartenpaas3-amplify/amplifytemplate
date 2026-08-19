@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { brandConfig } from '../../config/brand.config';
+import { grainSvgDataUri } from '../../config/theme';
 import { MagneticButton } from '../ui/MagneticButton';
 import type { Language } from '../../types';
 
@@ -17,12 +18,6 @@ const wordVariants = {
   hidden: { opacity: 0, y: 18 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } },
 };
-
-// Grain texture as an inline SVG data-uri (feTurbulence) — no image asset
-// needed, works for every client. Applied at low opacity with
-// mix-blend-mode overlay so it adds cinematic texture without darkening.
-const GRAIN_SVG =
-  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>";
 
 // Wow module (Layer 3): "parallaxHero", now a genuinely distinct layout
 // rather than a polished version of the most generic hero pattern that
@@ -85,7 +80,7 @@ export const ParallaxHero: React.FC<WowHeroProps> = ({ language, onCtaClick }) =
           {/* Film grain, subtly fading as you scroll past the hero */}
           <motion.div
             className="absolute inset-0 mix-blend-overlay"
-            style={{ backgroundImage: `url("${GRAIN_SVG}")`, opacity: grainOpacity }}
+            style={{ backgroundImage: `url("${grainSvgDataUri}")`, opacity: grainOpacity }}
           />
         </motion.div>
       </motion.div>
