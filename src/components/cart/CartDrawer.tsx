@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Trash2, Minus, Plus } from 'lucide-react';
 import { brandConfig } from '../../config/brand.config';
-import { motionTokens, shadowTokens, cutCornerClipPath } from '../../config/theme';
+import { motionTokens, shadowTokens } from '../../config/theme';
+import { MagneticButton } from '../ui/MagneticButton';
 import { useCart } from './CartContext';
 import { generateWhatsAppMessage, buildWhatsAppUrl, makeOrderRef } from '../checkout/generateWhatsAppMessage';
 import type { CheckoutCustomerInfo, DiningOption, Language } from '../../types';
@@ -169,14 +170,17 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ language }) => {
                   </span>
                 </div>
 
-                <button
+                <MagneticButton
                   onClick={handleCheckout}
                   disabled={!customerName}
-                  className="w-full py-3.5 rounded-lg font-bold disabled:opacity-40"
-                  style={{ backgroundColor: colors.primary, color: colors.background, clipPath: cutCornerClipPath }}
+                  glowColor={colors.accent}
+                  showArrow={false}
+                  fullWidth
+                  className="py-3.5 font-bold"
+                  style={{ backgroundColor: colors.primary, color: colors.background }}
                 >
                   {language === 'fr' ? 'Commander sur WhatsApp' : language === 'ar' ? 'اطلب عبر واتساب' : 'Order via WhatsApp'}
-                </button>
+                </MagneticButton>
               </div>
             )}
           </motion.div>

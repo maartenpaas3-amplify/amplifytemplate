@@ -2,7 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Minus, Plus } from 'lucide-react';
 import { brandConfig } from '../../config/brand.config';
-import { motionTokens, cutCornerClipPath } from '../../config/theme';
+import { motionTokens } from '../../config/theme';
+import { MagneticButton } from '../ui/MagneticButton';
 import { useCart } from '../cart/CartContext';
 import type { Language, MenuItem, SelectedOption } from '../../types';
 
@@ -167,14 +168,19 @@ export const ItemModal: React.FC<ItemModalProps> = ({ item, language, onClose })
                 </button>
               </div>
 
-              <button
-                disabled={!requiredGroupsSatisfied}
-                onClick={handleAdd}
-                className="flex-1 py-3 rounded-lg font-bold text-sm disabled:opacity-40"
-                style={{ backgroundColor: colors.primary, color: colors.background, clipPath: cutCornerClipPath }}
-              >
-                {language === 'fr' ? 'Ajouter' : language === 'ar' ? 'إضافة' : 'Add'} — {unitPrice * quantity} {ordering.currency}
-              </button>
+              <div className="flex-1">
+                <MagneticButton
+                  disabled={!requiredGroupsSatisfied}
+                  onClick={handleAdd}
+                  glowColor={colors.accent}
+                  showArrow={false}
+                  fullWidth
+                  className="py-3 font-bold text-sm"
+                  style={{ backgroundColor: colors.primary, color: colors.background }}
+                >
+                  {language === 'fr' ? 'Ajouter' : language === 'ar' ? 'إضافة' : 'Add'} — {unitPrice * quantity} {ordering.currency}
+                </MagneticButton>
+              </div>
             </div>
           </div>
         </motion.div>

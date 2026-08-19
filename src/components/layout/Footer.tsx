@@ -1,7 +1,7 @@
 import React from 'react';
-import { MapPin, Phone, Instagram, Clock, UtensilsCrossed } from 'lucide-react';
+import { MapPin, Phone, Instagram, Clock } from 'lucide-react';
 import { brandConfig } from '../../config/brand.config';
-import { cutCornerClipPath } from '../../config/theme';
+import { MagneticButton } from '../ui/MagneticButton';
 import type { Language } from '../../types';
 
 interface FooterProps {
@@ -45,14 +45,17 @@ export const Footer: React.FC<FooterProps> = ({ language, onViewMenuClick }) => 
             {identity.tagline[language] ?? identity.tagline.fr}
           </p>
 
-          <button
-            onClick={onViewMenuClick}
-            className="mt-5 inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold"
-            style={{ backgroundColor: colors.primary, color: colors.background, clipPath: cutCornerClipPath }}
-          >
-            <UtensilsCrossed className="w-4 h-4" />
-            {language === 'fr' ? 'Voir le menu' : language === 'ar' ? 'شاهد القائمة' : 'View menu'}
-          </button>
+          <div className="mt-5 inline-block">
+            <MagneticButton
+              onClick={onViewMenuClick}
+              glowColor={colors.accent}
+              showArrow={false}
+              className="px-4 py-2.5 text-sm font-bold"
+              style={{ backgroundColor: colors.primary, color: colors.background }}
+            >
+              {language === 'fr' ? 'Voir le menu' : language === 'ar' ? 'شاهد القائمة' : 'View menu'}
+            </MagneticButton>
+          </div>
         </div>
 
         <div className="space-y-4">
