@@ -3,7 +3,6 @@ import { motion } from 'motion/react';
 import { Plus } from 'lucide-react';
 import { brandConfig } from '../../config/brand.config';
 import { motionTokens } from '../../config/theme';
-import { OrnamentDivider } from '../ui/OrnamentDivider';
 import type { Language, MenuItem } from '../../types';
 
 interface ItemCardProps {
@@ -14,11 +13,6 @@ interface ItemCardProps {
   // `large` switches the image to fill that taller space and bumps the
   // type scale slightly instead of just stretching the same small layout.
   large?: boolean;
-  // A regular (non-signature) card that MenuSection has picked to run a
-  // taller image on — see the comment there for why. Keeps the grid from
-  // reading as a flat, uniform table of equal boxes on categories that
-  // don't happen to have a signature item.
-  tall?: boolean;
   // MenuSection caps visible tag badges to 1 per category so the signal
   // doesn't get diluted — this tells the card whether IT is the one
   // allowed to show its tag this round, even if item.tags has data.
@@ -31,7 +25,7 @@ interface ItemCardProps {
 // card lifts off a dark page instead of blending into it), and the price
 // rendered in the brand's accent color so it reads as a distinct, designed
 // element rather than plain body text.
-export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, large = false, tall = false, showTag = false }) => {
+export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, large = false, showTag = false }) => {
   const { colors, ordering } = brandConfig;
   const name = item.name[language] ?? item.name.fr;
   const description = item.description?.[language] ?? item.description?.fr;
@@ -49,7 +43,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, larg
         border: `1px solid ${colors.border}`,
       }}
     >
-      <div className={`w-full overflow-hidden relative ${large ? 'flex-1 min-h-[10rem]' : tall ? 'aspect-[3/4]' : 'aspect-[4/3]'}`}>
+      <div className={`w-full overflow-hidden relative ${large ? 'flex-1 min-h-[10rem]' : 'aspect-[4/3]'}`}>
         {/* object-position: center keeps every card's crop anchored the same
             way regardless of how the source photo itself is composed, so a
             tightly-cropped ingredient shot and a wide plated shot still line
@@ -88,9 +82,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, larg
         )}
       </div>
       <div className={`flex flex-col gap-1.5 ${large ? 'p-5' : 'p-4'}`}>
-        {/* The studio's one ornamental detail also marks the signature dish
-            card, at small scale — the second (and last) place it appears. */}
-        {large && <OrnamentDivider color={colors.accent} height={9} opacity={0.75} className="mb-0.5 max-w-[7rem]" />}
         <h3
           className={`font-display font-semibold leading-tight ${large ? 'text-xl sm:text-2xl' : 'text-[15px]'}`}
           style={{ color: colors.textPrimary }}

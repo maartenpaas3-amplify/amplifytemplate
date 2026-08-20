@@ -65,7 +65,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ category, items, langu
               "populaire," nothing is. */}
           {(() => {
             let tagBudget = 1;
-            return items.map((item, index) => {
+            return items.map((item) => {
               const showTag = Boolean(item.tags?.[0]) && !item.signature && tagBudget > 0;
               if (showTag) tagBudget -= 1;
               return (
@@ -74,18 +74,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ category, items, langu
                   variants={cardVariants}
                   className={item.signature ? 'col-span-2 row-span-2' : undefined}
                 >
-                  {/* Every 3rd non-signature card runs a taller image (see
-                      ItemCard's `tall` prop) — a deterministic-but-not-uniform
-                      rhythm so a category WITHOUT a signature item still has
-                      visual variation instead of a flat grid of equal boxes. */}
-                  <ItemCard
-                    item={item}
-                    language={language}
-                    onOpen={onOpenItem}
-                    large={item.signature}
-                    tall={!item.signature && index % 3 === 1}
-                    showTag={showTag}
-                  />
+                  <ItemCard item={item} language={language} onOpen={onOpenItem} large={item.signature} showTag={showTag} />
                 </motion.div>
               );
             });

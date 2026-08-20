@@ -25,17 +25,18 @@ const LANG_LABEL: Record<Language, string> = { fr: 'FR', ar: 'AR', en: 'EN' };
 
 // Fixed engine component.
 //
-// v2 — "minimal wordmark bar". The previous version (logo in a circle,
-// language in a filled pill, cart in a bordered/filled pill with a stock
-// shopping-bag icon) is the single most common restaurant-site header
-// pattern that exists. No amount of recoloring made it feel bespoke,
-// because the STRUCTURE was generic, not the color. This version removes
-// every circle, pill and color-block from the chrome itself: logo is a
-// plain text monogram (no ring), language is a bare text control, and the
-// cart is icon+total as plain text with a custom-drawn basket glyph
-// instead of the generic lucide ShoppingBag — no icon-in-a-circle left
-// anywhere. The header is now just type and line-icons on the bar, nothing
-// competing for attention with the actual content below it.
+// v3 — "minimal wordmark bar, with weight from behavior instead of a mark".
+// v2 stripped every circle/pill/logo from the chrome, which was the right
+// call — but left in a static, always-solid bar that read as flat/bare
+// against the rest of the site. v3 keeps the exact same content (no logo,
+// no icon returns) and instead gives the header presence through how it
+// BEHAVES in the page: it starts fully transparent, sitting directly on
+// top of the hero photo with no bar at all, then gains a soft blurred
+// surface + hairline the moment you scroll past it — the header earns its
+// materiality instead of it being printed on statically. A thin gold
+// scroll-progress line under the bar is the one other addition: it fills
+// left-to-right as you move through the page, a quiet functional detail
+// rather than decoration.
 //
 // Mobile-overflow contract unchanged: fixed row height, flex-nowrap on the
 // main row, min-w-0 + truncate on the brand name, shrink-0 on every
@@ -44,11 +45,17 @@ const LANG_LABEL: Record<Language, string> = { fr: 'FR', ar: 'AR', en: 'EN' };
 export const Header: React.FC<HeaderProps> = ({ language, setLanguage }) => {
   const { count, totalMAD, openDrawer, bumpTrigger } = useCart();
   const [scrolled, setScrolled] = useState(false);
+  const [scrollPct, setScrollPct] = useState(0);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollPct(max > 0 ? Math.min(1, window.scrollY / max) : 0);
+    };
+    onScroll();
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -66,8 +73,11 @@ export const Header: React.FC<HeaderProps> = ({ language, setLanguage }) => {
 
   return (
     <header
-      className={`sticky top-0 z-40 backdrop-blur-md transition-all duration-300 ${scrolled ? 'shadow-lg' : ''}`}
-      style={{ backgroundColor: `${colors.surface}F2`, borderBottom: `1px solid ${colors.border}` }}
+      className={`sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'backdrop-blur-md shadow-lg' : ''}`}
+      style={{
+        backgroundColor: scrolled ? `${colors.surface}F2` : 'transparent',
+        borderBottom: `1px solid ${scrolled ? colors.border : 'transparent'}`,
+      }}
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-4 h-16 sm:h-20 flex items-center justify-between gap-2 flex-nowrap">
         <a
@@ -158,6 +168,17 @@ export const Header: React.FC<HeaderProps> = ({ language, setLanguage }) => {
             </span>
           </motion.button>
         </div>
+      </div>
+
+      {/* Scroll-progress hairline: fills left-to-right with how far you are
+          into the page. Purely functional, but it's also the one bit of
+          motion the header owns at all times — a quiet reward for
+          engagement instead of a static bar that never changes. */}
+      <div className="h-px w-full transition-colors duration-300" style={{ backgroundColor: scrolled ? colors.border : 'transparent' }}>
+        <div
+          className="h-full"
+          style={{ width: `${scrollPct * 100}%`, backgroundColor: colors.accent, transition: 'width 100ms linear' }}
+        />
       </div>
     </header>
   );

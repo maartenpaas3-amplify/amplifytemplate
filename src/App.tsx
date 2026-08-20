@@ -15,7 +15,6 @@ import { CustomCursor } from './components/wow/CustomCursor';
 import { IntroTransition } from './components/wow/IntroTransition';
 import { SignatureSpotlight } from './components/wow/SignatureSpotlight';
 import { PaperTexture } from './components/ui/PaperTexture';
-import { OrnamentDivider } from './components/ui/OrnamentDivider';
 import { categories, menuItems } from './data/menu.example'; // -> switch to './data/menu' per client
 import type { Language, MenuItem } from './types';
 
@@ -78,7 +77,6 @@ export default function App() {
           <MenuSection category={activeCategory} items={activeItems} language={language} onOpenItem={setOpenItem} />
         )}
 
-        <OrnamentDivider color={brandConfig.colors.accent} height={16} opacity={0.8} />
         <Footer language={language} onViewMenuClick={scrollToMenu} />
 
         <ItemModal item={openItem} language={language} onClose={() => setOpenItem(null)} />
