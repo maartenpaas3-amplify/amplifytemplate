@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Trash2, Minus, Plus } from 'lucide-react';
 import { brandConfig } from '../../config/brand.config';
@@ -6,18 +6,23 @@ import { motionTokens, shadowTokens } from '../../config/theme';
 import { MagneticButton } from '../ui/MagneticButton';
 import { useCart } from './CartContext';
 import { generateWhatsAppMessage, buildWhatsAppUrl, makeOrderRef } from '../checkout/generateWhatsAppMessage';
-import type { CheckoutCustomerInfo, DiningOption, Language } from '../../types';
+import type { CheckoutCustomerInfo, DiningOption, Language, MenuItem } from '../../types';
 
 interface CartDrawerProps {
   language: Language;
+  // Full menu, used only to build the "Vous aimerez aussi" cross-sell strip
+  // (see below). Optional so the drawer still works if a caller doesn't
+  // wire it up — it just skips the strip.
+  allItems?: MenuItem[];
+  onOpenItem?: (item: MenuItem) => void;
 }
 
 // Fixed engine component. The ONE checkout flow every client site uses:
 // review cart -> fill dining option/name/phone -> send to WhatsApp via
 // generateWhatsAppMessage.ts (which reads the number from brand.config.ts).
-export const CartDrawer: React.FC<CartDrawerProps> = ({ language }) => {
+export const CartDrawer: React.FC<CartDrawerProps> = ({ language, allItems = [], onOpenItem }) => {
   const { colors, ordering } = brandConfig;
-  const { lines, totalMAD, isDrawerOpen, closeDrawer, removeLine, updateQuantity, clear } = useCart();
+  const { lines, totalMAD, isDrawerOpen, closeDrawer, removeLine, updateQuantity, clear, addLine } = useCart();
   const [customerName, setCustomerName] = useState('');
   const [diningOption, setDiningOption] = useState<DiningOption>(brandConfig.ordering.diningOptionsEnabled[0]);
   const [tableNumber, setTableNumber] = useState('');
@@ -49,6 +54,26 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ language }) => {
     window.open(url, '_blank');
     clear();
     closeDrawer();
+  };
+
+  // Cross-sell strip: fills the dead space that used to sit under a 1-2
+  // item cart with something useful instead of empty black — a few dishes
+  // not already in the order, one tap to add. Capped at 4, and only shown
+  // while the cart is still light (a full cart doesn't need upselling, and
+  // there'd be no room for it anyway once the line list is long).
+  const suggestions = useMemo(() => {
+    if (lines.length === 0 || lines.length >= 4) return [];
+    const inCartIds = new Set(lines.map((l) => l.item.id));
+    return allItems.filter((i) => !inCartIds.has(i.id)).slice(0, 4);
+  }, [allItems, lines]);
+
+  const handleQuickAdd = (item: MenuItem) => {
+    if (item.optionGroups?.some((g) => g.required)) {
+      onOpenItem?.(item);
+      closeDrawer();
+      return;
+    }
+    addLine(item, 1, [], undefined);
   };
 
   const diningLabels: Record<DiningOption, string> = {
@@ -137,6 +162,45 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ language }) => {
                   </div>
                 );
               })}
+
+              {suggestions.length > 0 && (
+                <div className="pt-2">
+                  <span className="block text-[11px] font-bold uppercase tracking-[0.2em] mb-2.5" style={{ color: colors.textMuted }}>
+                    {language === 'fr' ? 'Vous aimerez aussi' : language === 'ar' ? 'قد يعجبك أيضاً' : 'You might also like'}
+                  </span>
+                  <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-4 px-4" style={{ scrollbarWidth: 'none' }}>
+                    {suggestions.map((item) => {
+                      const name = item.name[language] ?? item.name.fr;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => handleQuickAdd(item)}
+                          className="shrink-0 w-28 text-left rounded-xl overflow-hidden"
+                          style={{ backgroundColor: colors.surfaceMuted, border: `1px solid ${colors.border}` }}
+                        >
+                          <img src={item.image} alt={name} className="w-full aspect-square object-cover" />
+                          <div className="p-2">
+                            <p className="text-[11px] font-semibold leading-tight line-clamp-2" style={{ color: colors.textPrimary }}>
+                              {name}
+                            </p>
+                            <div className="flex items-center justify-between mt-1.5">
+                              <span className="text-[11px] font-bold" style={{ color: colors.accent }}>
+                                {item.priceMAD} {ordering.currency}
+                              </span>
+                              <span
+                                className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                                style={{ backgroundColor: colors.accent, color: colors.background }}
+                              >
+                                <Plus className="w-3 h-3" />
+                              </span>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {lines.length > 0 && (

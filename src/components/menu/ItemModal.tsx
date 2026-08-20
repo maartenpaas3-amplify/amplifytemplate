@@ -22,6 +22,12 @@ export const ItemModal: React.FC<ItemModalProps> = ({ item, language, onClose })
   const [quantity, setQuantity] = useState(1);
   const [selected, setSelected] = useState<Record<string, string[]>>({});
   const [note, setNote] = useState('');
+  // The note field used to be an always-visible textarea on EVERY item,
+  // even simple ones like a plain samosa where "any notes?" is just noise.
+  // Now it's a quiet text link that expands into the textarea on demand —
+  // still one tap away for the item that actually needs it (spice level,
+  // allergy, no onions...), invisible weight for the ones that don't.
+  const [noteOpen, setNoteOpen] = useState(false);
 
   const selectedOptions: SelectedOption[] = useMemo(() => {
     if (!item?.optionGroups) return [];
@@ -69,6 +75,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({ item, language, onClose })
     setQuantity(1);
     setSelected({});
     setNote('');
+    setNoteOpen(false);
   };
 
   return (
@@ -138,14 +145,29 @@ export const ItemModal: React.FC<ItemModalProps> = ({ item, language, onClose })
               </div>
             ))}
 
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder={language === 'fr' ? 'Note (optionnel)' : language === 'ar' ? 'ملاحظة (اختياري)' : 'Note (optional)'}
-              className="w-full rounded-xl px-3 py-2 text-sm resize-none"
-              style={{ backgroundColor: colors.surfaceMuted, color: colors.textPrimary, border: `1px solid ${colors.border}` }}
-              rows={2}
-            />
+            {noteOpen ? (
+              <motion.textarea
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                autoFocus
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder={
+                  language === 'fr' ? 'Ex : sans oignon, peu épicé...' : language === 'ar' ? 'مثال: بدون بصل، غير حار...' : 'E.g. no onions, mild...'
+                }
+                className="w-full rounded-xl px-3 py-2 text-sm resize-none"
+                style={{ backgroundColor: colors.surfaceMuted, color: colors.textPrimary, border: `1px solid ${colors.border}` }}
+                rows={2}
+              />
+            ) : (
+              <button
+                onClick={() => setNoteOpen(true)}
+                className="text-xs font-semibold underline underline-offset-2"
+                style={{ color: colors.textMuted }}
+              >
+                {language === 'fr' ? '+ Ajouter une remarque' : language === 'ar' ? '+ إضافة ملاحظة' : '+ Add a note'}
+              </button>
+            )}
 
             <div className="flex items-center justify-between gap-3 pt-2">
               <div className="flex items-center gap-3 rounded-full px-2 py-1" style={{ backgroundColor: colors.surfaceMuted }}>

@@ -82,7 +82,7 @@ export default function App() {
         <Footer language={language} onViewMenuClick={scrollToMenu} />
 
         <ItemModal item={openItem} language={language} onClose={() => setOpenItem(null)} />
-        <CartDrawer language={language} />
+        <CartDrawer language={language} allItems={menuItems} onOpenItem={setOpenItem} />
         <FloatingCartBar language={language} />
       </div>
     </CartProvider>

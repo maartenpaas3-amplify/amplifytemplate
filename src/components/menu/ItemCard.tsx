@@ -19,6 +19,10 @@ interface ItemCardProps {
   // reading as a flat, uniform table of equal boxes on categories that
   // don't happen to have a signature item.
   tall?: boolean;
+  // MenuSection caps visible tag badges to 1 per category so the signal
+  // doesn't get diluted — this tells the card whether IT is the one
+  // allowed to show its tag this round, even if item.tags has data.
+  showTag?: boolean;
 }
 
 // Fixed engine component. Every menu item on every client site renders
@@ -27,7 +31,7 @@ interface ItemCardProps {
 // card lifts off a dark page instead of blending into it), and the price
 // rendered in the brand's accent color so it reads as a distinct, designed
 // element rather than plain body text.
-export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, large = false, tall = false }) => {
+export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, large = false, tall = false, showTag = false }) => {
   const { colors, ordering } = brandConfig;
   const name = item.name[language] ?? item.name.fr;
   const description = item.description?.[language] ?? item.description?.fr;
@@ -74,7 +78,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, larg
             signature dish. Opposite corner from Signature so both can
             appear together without colliding. Outline style (not filled)
             so it reads as a lighter-weight callout than Signature. */}
-        {item.tags?.[0] && (
+        {showTag && item.tags?.[0] && (
           <span
             className="absolute top-2 right-2 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full backdrop-blur-sm"
             style={{ color: colors.textPrimary, border: `1px solid ${colors.textPrimary}55`, backgroundColor: `${colors.background}66` }}

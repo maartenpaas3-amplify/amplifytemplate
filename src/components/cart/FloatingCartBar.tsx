@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { brandConfig } from '../../config/brand.config';
 import { BasketIcon } from '../ui/BasketIcon';
@@ -17,9 +17,27 @@ interface FloatingCartBarProps {
 // something to order, and disappears the moment the cart is emptied.
 // Tapping it opens the same CartDrawer the header cart icon opens — one
 // checkout flow, just two ways to reach it.
+//
+// It deliberately stays hidden while the hero (id="top") is still on
+// screen — a gold floating bar stacked directly under the hero's own gold
+// CTA button read as two competing calls-to-action fighting for the same
+// tap. IntersectionObserver watches the hero; once it's scrolled past,
+// the bar is free to appear. Sites without a hero module simply never
+// find #top, so the bar behaves exactly as before (always eligible).
 export const FloatingCartBar: React.FC<FloatingCartBarProps> = ({ language }) => {
   const { count, totalMAD, openDrawer, isDrawerOpen } = useCart();
   const { colors, ordering } = brandConfig;
+  const [heroVisible, setHeroVisible] = useState(false);
+
+  useEffect(() => {
+    const heroEl = document.getElementById('top');
+    if (!heroEl) return;
+    const observer = new IntersectionObserver(([entry]) => setHeroVisible(entry.isIntersecting), {
+      threshold: 0.15,
+    });
+    observer.observe(heroEl);
+    return () => observer.disconnect();
+  }, []);
 
   const label = language === 'fr' ? 'Voir la commande' : language === 'ar' ? 'عرض الطلب' : 'View order';
   const itemsLabel =
@@ -32,7 +50,7 @@ export const FloatingCartBar: React.FC<FloatingCartBarProps> = ({ language }) =>
   return (
     <div className="sm:hidden fixed inset-x-0 bottom-0 z-30 px-3 pointer-events-none" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
       <AnimatePresence>
-        {count > 0 && !isDrawerOpen && (
+        {count > 0 && !isDrawerOpen && !heroVisible && (
           <motion.button
             key="floating-cart"
             onClick={openDrawer}
