@@ -16,11 +16,18 @@ export const EditorialMoment: React.FC<EditorialMomentProps> = ({ language, sign
   const { colors, identity } = brandConfig;
 
   return (
-    <section className="max-w-7xl mx-auto px-4 py-16 grid sm:grid-cols-2 gap-8 items-center">
+    // Not touching the hero itself, but this section directly follows it —
+    // the old `py-16` top padding plus a whileInView reveal that only fires
+    // once you'd scrolled it 80px into view meant this section could sit
+    // fully rendered but still invisible right after the hero, reading as
+    // dead black space instead of content. Tighter top padding on mobile
+    // + firing the reveal as soon as any part is on screen (no negative
+    // margin) fixes that without changing anything above this point.
+    <section className="max-w-7xl mx-auto px-4 pt-8 pb-16 sm:py-16 grid sm:grid-cols-2 gap-8 items-center">
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: '-80px' }}
+        viewport={{ once: true }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       >
         <span className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: colors.accent }}>
@@ -40,7 +47,7 @@ export const EditorialMoment: React.FC<EditorialMomentProps> = ({ language, sign
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: '-80px' }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="rounded-2xl overflow-hidden aspect-[4/3]"
         >

@@ -27,6 +27,13 @@ export interface BrandConfig {
     faviconSrc: string;
     city: string;
     country: string;
+    // Optional: the live URL once the client is published (e.g. the Cloud
+    // Run URL from AI Studio, or a custom domain). Used to make the SEO/
+    // Open Graph tags (see vite-plugins/seo-html.ts) absolute instead of
+    // relative — WhatsApp/Facebook link previews need an absolute image
+    // URL to reliably render a preview card. Leave empty until the site is
+    // actually published; tags degrade gracefully (relative URLs) without it.
+    siteUrl?: string;
   };
 
   colors: {
@@ -104,6 +111,7 @@ export const brandConfig: BrandConfig = {
     faviconSrc: '/brand/favicon.svg',
     city: 'Casablanca',
     country: 'Maroc',
+    siteUrl: '', // e.g. 'https://indian-spice-rabat.a.run.app' once published
   },
 
   colors: {
@@ -121,9 +129,9 @@ export const brandConfig: BrandConfig = {
   },
 
   typography: {
-    displayFont: "'Fraunces', serif",
+    displayFont: "'Bodoni Moda', serif",
     bodyFont: "'Inter', sans-serif",
-    displayWeight: 600,
+    displayWeight: 700,
   },
 
   hero: {

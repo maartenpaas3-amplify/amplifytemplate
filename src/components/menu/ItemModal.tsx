@@ -176,7 +176,6 @@ export const ItemModal: React.FC<ItemModalProps> = ({ item, language, onClose })
                   showArrow={false}
                   fullWidth
                   className="py-3 font-bold text-sm"
-                  style={{ backgroundColor: colors.primary, color: colors.background }}
                 >
                   {language === 'fr' ? 'Ajouter' : language === 'ar' ? 'إضافة' : 'Add'} — {unitPrice * quantity} {ordering.currency}
                 </MagneticButton>

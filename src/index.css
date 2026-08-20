@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: var(--font-display-runtime, 'Fraunces', serif);
-  --font-body: var(--font-body-runtime, 'Inter', sans-serif);
+  /* --font-display-runtime / --font-body-runtime are set from
+     brandConfig.typography at runtime (see App.tsx / theme.ts
+     cssVarsFromBrand) — the plain 'serif'/'sans-serif' fallbacks here only
+     kick in if that ever fails to run, they're not meant to encode a
+     specific typeface. Previously this hardcoded 'Fraunces'/'Inter' as the
+     fallback and the runtime var was never actually being set anywhere, so
+     brand.config.ts's typography field silently did nothing — fixed. */
+  --font-display: var(--font-display-runtime, serif);
+  --font-body: var(--font-body-runtime, sans-serif);
 }
 
 html {

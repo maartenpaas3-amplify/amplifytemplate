@@ -177,7 +177,6 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ language }) => {
                   showArrow={false}
                   fullWidth
                   className="py-3.5 font-bold"
-                  style={{ backgroundColor: colors.primary, color: colors.background }}
                 >
                   {language === 'fr' ? 'Commander sur WhatsApp' : language === 'ar' ? 'اطلب عبر واتساب' : 'Order via WhatsApp'}
                 </MagneticButton>

@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
+import { brandConfig } from '../../config/brand.config';
 
 interface MagneticButtonProps {
   children: React.ReactNode;
@@ -18,16 +19,16 @@ interface MagneticButtonProps {
 // presence (hero, footer, add-to-cart, checkout) — one implementation, not
 // four hand-rolled buttons drifting apart.
 //
-// v2: replaced the stacked ambient effects (breathing glow + rotating ring +
-// looping arrow + particle burst) with ONE deliberate motion instead of four
-// competing ones. Four things moving at once on a small button reads as
-// noisy, not premium — that was a real mistake in the previous version.
-//
-// The new idea: a page-fold. On press, the bottom-right corner of the button
-// lifts like a turned page corner, with a soft shadow underneath, then
-// settles back. It's a TAP effect (whileTap / press), not a hover effect —
-// the real audience orders from a phone, where hover doesn't exist. The
-// button is calm at rest; the fold is the entire "reward" moment.
+// v3: "quiet luxury" outline button. Earlier versions tried to earn "wow"
+// by stacking ambient motion (v1) or a single press gimmick (v2, page-fold).
+// Both still read as an app-button doing a trick. This version borrows from
+// hospitality/editorial brands instead of SaaS: no filled pill at rest, just
+// a thin border and colored label — quieter and, counterintuitively, reads
+// as MORE expensive than a bright solid block. On press, a solid fill sweeps
+// in from the left in one deliberate motion and the label switches to the
+// background color to stay legible against it, then both reverse on release.
+// One motion, no ambient loop, calm at rest — a screenshot at rest still
+// looks intentional instead of "nothing is happening yet".
 export const MagneticButton: React.FC<MagneticButtonProps> = ({
   children,
   onClick,
@@ -39,68 +40,47 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
   fullWidth = false,
   disabled = false,
 }) => {
-  const ref = useRef<HTMLButtonElement>(null);
+  const { colors } = brandConfig;
   const [pressed, setPressed] = useState(false);
+  const fillColor = glowColor ?? colors.primary;
 
   const shapeRadius = shape === 'pill' ? '999px' : '0.5rem';
-  const foldSize = shape === 'pill' ? 16 : 20;
 
   return (
     <span className={`relative ${fullWidth ? 'block w-full' : 'inline-block'}`}>
       <motion.button
-        ref={ref}
         onClick={onClick}
         onPointerDown={() => setPressed(true)}
         onPointerUp={() => setPressed(false)}
         onPointerLeave={() => setPressed(false)}
         disabled={disabled}
-        animate={{ scale: pressed ? 0.97 : 1 }}
-        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-        style={{ ...style, borderRadius: shapeRadius }}
+        style={{
+          borderRadius: shapeRadius,
+          border: `1.5px solid ${fillColor}`,
+          backgroundColor: 'transparent',
+          ...style,
+        }}
         className={`relative overflow-hidden inline-flex items-center justify-center gap-2 ${
           fullWidth ? 'w-full' : ''
         } disabled:opacity-40 ${className ?? ''}`}
       >
-        <span className="relative z-10">{children}</span>
-        {showArrow && (
-          <span className="relative z-10 inline-flex">
-            <ArrowRight className="w-4 h-4" />
-          </span>
-        )}
+        {/* Solid fill, sweeps in from the left on press, sweeps back out on release. */}
+        <motion.span
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{ backgroundColor: fillColor, originX: 0 }}
+          animate={{ scaleX: pressed ? 1 : 0 }}
+          transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+        />
 
-        {/* Page-fold: the corner lifts on press, revealing a shaded underside. */}
         <motion.span
-          aria-hidden
-          className="absolute bottom-0 right-0 pointer-events-none"
-          style={{
-            width: foldSize,
-            height: foldSize,
-            background: `linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.28) 50%)`,
-            transformOrigin: 'bottom right',
-          }}
-          animate={{
-            clipPath: pressed
-              ? 'polygon(100% 0%, 100% 100%, 0% 100%)'
-              : 'polygon(100% 55%, 100% 100%, 55% 100%)',
-            opacity: pressed ? 1 : 0.55,
-          }}
-          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        />
-        <motion.span
-          aria-hidden
-          className="absolute pointer-events-none"
-          style={{
-            width: foldSize * 1.6,
-            height: 3,
-            right: 0,
-            bottom: 0,
-            background: glowColor ?? 'rgba(255,255,255,0.5)',
-            transformOrigin: 'bottom right',
-            filter: 'blur(2px)',
-          }}
-          animate={{ opacity: pressed ? 0.5 : 0, rotate: -45 }}
-          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        />
+          className="relative z-10 inline-flex items-center gap-2"
+          animate={{ color: pressed ? colors.background : fillColor }}
+          transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {children}
+          {showArrow && <ArrowRight className="w-4 h-4" />}
+        </motion.span>
       </motion.button>
     </span>
   );

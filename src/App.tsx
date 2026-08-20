@@ -50,7 +50,7 @@ export default function App() {
 
   return (
     <CartProvider>
-      <div style={cssVarsFromBrand(brandConfig.colors) as React.CSSProperties}>
+      <div style={cssVarsFromBrand(brandConfig.colors, brandConfig.typography) as React.CSSProperties}>
         <PaperTexture />
         {wow.includes('introTransition') && <IntroTransition />}
         {wow.includes('customCursor') && <CustomCursor />}

@@ -51,9 +51,21 @@ export const layoutTokens = {
 
 // CSS custom properties injected at runtime from brand.config.ts, so
 // components can use `var(--color-primary)` in Tailwind arbitrary values
-// instead of importing brand.config directly everywhere.
-export function cssVarsFromBrand(colors: Record<string, string>): Record<string, string> {
+// instead of importing brand.config directly everywhere. Also sets the
+// `--font-display-runtime` / `--font-body-runtime` vars that index.css'
+// `--font-display` / `--font-body` read from — without this, changing
+// typography.displayFont/bodyFont in brand.config.ts silently did nothing,
+// because nothing ever wrote those runtime vars. Call with both colors and
+// typography (see App.tsx) to keep font changes a one-file edit.
+export function cssVarsFromBrand(
+  colors: Record<string, string>,
+  typography?: { displayFont: string; bodyFont: string }
+): Record<string, string> {
   const vars: Record<string, string> = {};
+  if (typography) {
+    vars['--font-display-runtime'] = typography.displayFont;
+    vars['--font-body-runtime'] = typography.bodyFont;
+  }
   for (const [key, value] of Object.entries(colors)) {
     const kebab = key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
     vars[`--color-${kebab}`] = value;

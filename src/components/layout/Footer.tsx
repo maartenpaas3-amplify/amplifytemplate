@@ -51,7 +51,6 @@ export const Footer: React.FC<FooterProps> = ({ language, onViewMenuClick }) => 
               glowColor={colors.accent}
               showArrow={false}
               className="px-4 py-2.5 text-sm font-bold"
-              style={{ backgroundColor: colors.primary, color: colors.background }}
             >
               {language === 'fr' ? 'Voir le menu' : language === 'ar' ? 'شاهد القائمة' : 'View menu'}
             </MagneticButton>
