@@ -7,6 +7,7 @@ import { CategoryNav } from './components/layout/CategoryNav';
 import { MenuSection } from './components/menu/MenuSection';
 import { ItemModal } from './components/menu/ItemModal';
 import { CartDrawer } from './components/cart/CartDrawer';
+import { FloatingCartBar } from './components/cart/FloatingCartBar';
 import { Footer } from './components/layout/Footer';
 import { ParallaxHero } from './components/wow/ParallaxHero';
 import { EditorialMoment } from './components/wow/EditorialMoment';
@@ -82,6 +83,7 @@ export default function App() {
 
         <ItemModal item={openItem} language={language} onClose={() => setOpenItem(null)} />
         <CartDrawer language={language} />
+        <FloatingCartBar language={language} />
       </div>
     </CartProvider>
   );

@@ -36,7 +36,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const lineTotalMAD = computeLineTotal(item, quantity, selectedOptions);
       setLines((prev) => [...prev, { lineId, item, quantity, selectedOptions, note, lineTotalMAD }]);
       setBumpTrigger((n) => n + 1);
-      setDrawerOpen(true);
+      // Deliberately does NOT open the drawer anymore. Popping the full
+      // checkout drawer open on every single add-to-cart interrupts
+      // browsing — especially bad on a menu with many dishes, where you
+      // add several things before you're ready to order. The floating
+      // cart bar (FloatingCartBar) is the non-intrusive signal instead;
+      // the drawer only opens when the person actually taps it or the
+      // header cart icon.
     },
     []
   );
