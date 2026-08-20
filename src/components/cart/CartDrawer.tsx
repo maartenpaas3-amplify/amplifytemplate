@@ -24,6 +24,23 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ language }) => {
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
+  // Two-tap clear-all instead of a browser confirm() popup (those block
+  // the page and look cheap). First tap arms it and shows a "Confirmer"
+  // label for 3s; a second tap within that window actually clears. Tapping
+  // anywhere else lets it quietly disarm on its own via the timeout.
+  const [clearArmed, setClearArmed] = useState(false);
+  const clearArmTimer = React.useRef<number | undefined>(undefined);
+
+  const handleClearTap = () => {
+    if (clearArmed) {
+      window.clearTimeout(clearArmTimer.current);
+      setClearArmed(false);
+      clear();
+      return;
+    }
+    setClearArmed(true);
+    clearArmTimer.current = window.setTimeout(() => setClearArmed(false), 3000);
+  };
 
   const handleCheckout = () => {
     const customer: CheckoutCustomerInfo = { customerName, diningOption, tableNumber, deliveryAddress, phone, notes };
@@ -57,9 +74,22 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ language }) => {
               <h2 className="font-display text-lg font-semibold" style={{ color: colors.textPrimary }}>
                 {language === 'fr' ? 'Votre commande' : language === 'ar' ? 'طلبك' : 'Your order'}
               </h2>
-              <button onClick={closeDrawer} style={{ color: colors.textMuted }}>
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                {lines.length > 0 && (
+                  <button
+                    onClick={handleClearTap}
+                    aria-label="clear-all-cart"
+                    className="flex items-center gap-1.5 px-2 py-1.5 rounded-full text-xs font-bold"
+                    style={{ color: clearArmed ? colors.danger : colors.textMuted }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    {clearArmed && (language === 'fr' ? 'Confirmer' : language === 'ar' ? 'تأكيد' : 'Confirm')}
+                  </button>
+                )}
+                <button onClick={closeDrawer} className="p-1.5" style={{ color: colors.textMuted }}>
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 p-4 space-y-3">
@@ -78,7 +108,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ language }) => {
                         <span className="font-semibold text-sm truncate" style={{ color: colors.textPrimary }}>
                           {name}
                         </span>
-                        <button onClick={() => removeLine(line.lineId)} style={{ color: colors.textMuted }}>
+                        <button onClick={() => removeLine(line.lineId)} aria-label="remove-line" style={{ color: colors.textMuted }}>
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -118,7 +148,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ language }) => {
                       onClick={() => setDiningOption(opt)}
                       className="flex-1 py-2 rounded-full text-xs font-semibold"
                       style={{
-                        backgroundColor: diningOption === opt ? colors.primary : colors.surfaceMuted,
+                        backgroundColor: diningOption === opt ? colors.accent : colors.surfaceMuted,
                         color: diningOption === opt ? colors.background : colors.textMuted,
                       }}
                     >

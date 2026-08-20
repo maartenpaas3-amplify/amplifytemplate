@@ -42,7 +42,7 @@ export const FloatingCartBar: React.FC<FloatingCartBarProps> = ({ language }) =>
             transition={{ type: 'spring', stiffness: 340, damping: 28 }}
             className="pointer-events-auto w-full max-w-md mx-auto flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5"
             style={{
-              backgroundColor: colors.primary,
+              backgroundColor: colors.accent,
               color: colors.background,
               boxShadow: '0 12px 32px -8px rgba(0,0,0,0.6)',
             }}
@@ -52,7 +52,7 @@ export const FloatingCartBar: React.FC<FloatingCartBarProps> = ({ language }) =>
                 <BasketIcon className="w-5 h-5" />
                 <span
                   className="absolute -top-2 -right-2 text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: colors.background, color: colors.primary }}
+                  style={{ backgroundColor: colors.background, color: colors.accent }}
                 >
                   {count}
                 </span>

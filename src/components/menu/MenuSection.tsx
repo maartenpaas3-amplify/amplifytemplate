@@ -58,13 +58,23 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ category, items, langu
           exit={{ opacity: 0, transition: { duration: 0.15 } }}
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4 auto-rows-[1fr]"
         >
-          {items.map((item) => (
+          {items.map((item, index) => (
             <motion.div
               key={item.id}
               variants={cardVariants}
               className={item.signature ? 'col-span-2 row-span-2' : undefined}
             >
-              <ItemCard item={item} language={language} onOpen={onOpenItem} large={item.signature} />
+              {/* Every 3rd non-signature card runs a taller image (see
+                  ItemCard's `tall` prop) — a deterministic-but-not-uniform
+                  rhythm so a category WITHOUT a signature item still has
+                  visual variation instead of a flat grid of equal boxes. */}
+              <ItemCard
+                item={item}
+                language={language}
+                onOpen={onOpenItem}
+                large={item.signature}
+                tall={!item.signature && index % 3 === 1}
+              />
             </motion.div>
           ))}
         </motion.div>

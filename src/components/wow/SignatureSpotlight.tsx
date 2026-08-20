@@ -58,7 +58,7 @@ export const SignatureSpotlight: React.FC<SignatureSpotlightProps> = ({ item, la
           <button
             onClick={() => onAdd(item)}
             className="px-6 py-3 rounded-full font-bold text-sm"
-            style={{ backgroundColor: colors.primary, color: colors.background }}
+            style={{ backgroundColor: colors.accent, color: colors.background }}
           >
             {language === 'fr' ? 'Ajouter au panier' : language === 'ar' ? 'أضف إلى السلة' : 'Add to cart'}
           </button>

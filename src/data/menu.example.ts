@@ -53,6 +53,7 @@ export const menuItems: MenuItem[] = [
     description: { fr: 'Légère et parfumée.', en: 'Light and fragrant.' },
     priceMAD: 35,
     image: '/menu/item-4.jpg',
+    tags: ['Populaire'],
   },
   {
     id: 'item-5',

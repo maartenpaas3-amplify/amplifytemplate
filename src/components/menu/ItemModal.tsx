@@ -114,7 +114,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({ item, language, onClose })
               <div key={group.id}>
                 <h3 className="text-sm font-semibold mb-2" style={{ color: colors.textPrimary }}>
                   {group.label[language] ?? group.label.fr}
-                  {group.required && <span style={{ color: colors.primary }}> *</span>}
+                  {group.required && <span style={{ color: colors.accent }}> *</span>}
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {group.options.map((opt) => {
@@ -125,7 +125,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({ item, language, onClose })
                         onClick={() => toggleOption(group.id, opt.id, group.multiple)}
                         className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                         style={{
-                          backgroundColor: active ? colors.primary : colors.surfaceMuted,
+                          backgroundColor: active ? colors.accent : colors.surfaceMuted,
                           color: active ? colors.background : colors.textMuted,
                         }}
                       >

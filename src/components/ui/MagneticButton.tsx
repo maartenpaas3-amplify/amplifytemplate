@@ -42,7 +42,7 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
 }) => {
   const { colors } = brandConfig;
   const [pressed, setPressed] = useState(false);
-  const fillColor = glowColor ?? colors.primary;
+  const fillColor = glowColor ?? colors.accent;
 
   const shapeRadius = shape === 'pill' ? '999px' : '0.5rem';
 

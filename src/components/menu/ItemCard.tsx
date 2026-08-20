@@ -14,6 +14,11 @@ interface ItemCardProps {
   // `large` switches the image to fill that taller space and bumps the
   // type scale slightly instead of just stretching the same small layout.
   large?: boolean;
+  // A regular (non-signature) card that MenuSection has picked to run a
+  // taller image on — see the comment there for why. Keeps the grid from
+  // reading as a flat, uniform table of equal boxes on categories that
+  // don't happen to have a signature item.
+  tall?: boolean;
 }
 
 // Fixed engine component. Every menu item on every client site renders
@@ -22,7 +27,7 @@ interface ItemCardProps {
 // card lifts off a dark page instead of blending into it), and the price
 // rendered in the brand's accent color so it reads as a distinct, designed
 // element rather than plain body text.
-export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, large = false }) => {
+export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, large = false, tall = false }) => {
   const { colors, ordering } = brandConfig;
   const name = item.name[language] ?? item.name.fr;
   const description = item.description?.[language] ?? item.description?.fr;
@@ -31,6 +36,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, larg
     <motion.button
       onClick={() => onOpen(item)}
       whileHover={{ y: -5 }}
+      whileTap={{ scale: 0.97 }}
       transition={{ duration: motionTokens.base, ease: motionTokens.easeOut }}
       className="text-left rounded-2xl overflow-hidden flex flex-col w-full h-full"
       style={{
@@ -39,7 +45,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, larg
         border: `1px solid ${colors.border}`,
       }}
     >
-      <div className={`w-full overflow-hidden relative ${large ? 'flex-1 min-h-[10rem]' : 'aspect-[4/3]'}`}>
+      <div className={`w-full overflow-hidden relative ${large ? 'flex-1 min-h-[10rem]' : tall ? 'aspect-[3/4]' : 'aspect-[4/3]'}`}>
         {/* object-position: center keeps every card's crop anchored the same
             way regardless of how the source photo itself is composed, so a
             tightly-cropped ingredient shot and a wide plated shot still line
@@ -61,6 +67,19 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, larg
             style={{ backgroundColor: colors.accent, color: colors.background }}
           >
             Signature
+          </span>
+        )}
+        {/* Secondary tag badge (e.g. "Populaire", "Épicé") — gives EVERY
+            category some visual variation, not just the one with a
+            signature dish. Opposite corner from Signature so both can
+            appear together without colliding. Outline style (not filled)
+            so it reads as a lighter-weight callout than Signature. */}
+        {item.tags?.[0] && (
+          <span
+            className="absolute top-2 right-2 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full backdrop-blur-sm"
+            style={{ color: colors.textPrimary, border: `1px solid ${colors.textPrimary}55`, backgroundColor: `${colors.background}66` }}
+          >
+            {item.tags[0]}
           </span>
         )}
       </div>
@@ -92,7 +111,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, language, onOpen, larg
           </span>
           <span
             className={`rounded-full flex items-center justify-center shrink-0 transition-transform ${large ? 'w-10 h-10' : 'w-8 h-8'}`}
-            style={{ backgroundColor: colors.primary, color: colors.background }}
+            style={{ backgroundColor: colors.accent, color: colors.background }}
           >
             <Plus className={large ? 'w-5 h-5' : 'w-4 h-4'} />
           </span>
